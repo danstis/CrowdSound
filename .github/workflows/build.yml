@@ -32,7 +32,7 @@ jobs:
         run: go build -v ./...
 
   test:
-    name: Test
+    name: Test and Scan
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -40,15 +40,35 @@ jobs:
         with:
           go-version: ^1.20
         id: go
-
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: "5.x"
+      - name: Version with GitVersion # https://github.com/marketplace/actions/use-actions
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.15
 
-      - name: Test
-        run: go test -v -race ./...
+      - name: Run tests
+        run: go test -v -coverprofile=coverage.out -covermode=count -json ./... > test-report.out
 
-      - name: Go Vet
-        run: go vet ./...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.out # optional
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master # https://github.com/marketplace/actions/sonarcloud-scan
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ steps.gitversion.outputs.FullSemVer }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   lint:
     name: Lint
@@ -65,6 +85,9 @@ jobs:
 
       - name: Run golangci-lint # https://github.com/marketplace/actions/run-golangci-lint
         uses: golangci/golangci-lint-action@v3
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: latest
 
   release:
     name: Release
