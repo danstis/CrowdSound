@@ -1,7 +1,15 @@
 package api
 
+//go:generate swag init --parseDependency --parseInternal --output ../docs --dir ../../cmd/api
+
+// API comment formats: https://github.com/swaggo/swag/blob/master/README.md#declarative-comments-format
+
 import (
 	"github.com/gin-gonic/gin"
+
+	docs "github.com/danstis/CrowdSound/pkg/docs"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type (
@@ -17,9 +25,13 @@ type (
 // Returns a pointer to the API struct.
 func New() *API {
 	r := gin.Default()
+	docs.SwaggerInfo.BasePath = "/"
+	docs.SwaggerInfo.Title = "CrowdSound API"
 
 	r.GET("/ping", pingHandler)
 	r.GET("/version", versionHandler)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	return &API{
 		Router: r,
