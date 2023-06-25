@@ -1,0 +1,25 @@
+info:
+  contact: {}
+paths:
+  /ping:
+    get:
+      responses:
+        "204":
+          description: No Content
+      summary: Ping returns a simple 204 response if the api is online.
+      tags:
+      - utility
+  /version:
+    get:
+      description: Returns the current version of the API.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: json
+      summary: Version returns the current version of the API.
+      tags:
+      - utility
+swagger: "2.0"
