@@ -1,10 +1,17 @@
 package main
 
+import (
+	"log"
+
+	"github.com/danstis/CrowdSound/pkg/api"
+)
+
 const (
-	addr = ":9200"
+	ADDRESS string = ":9200"
 )
 
 func main() {
-	a := App{}
-	a.Run(addr)
+	api := api.New()
+	api.Address = ADDRESS
+	log.Fatal(api.Run())
 }
