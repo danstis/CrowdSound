@@ -1,0 +1,23 @@
+FROM golang:1.20.5-alpine AS builder
+
+RUN apk add --no-cache git gcc musl-dev zlib-static build-base
+
+ARG BUILD=0.0.0-development
+
+WORKDIR /github.com/danstis/CrowdSound/
+COPY ../go.mod .
+COPY ../go.sum .
+RUN go mod download
+COPY . .
+RUN mkdir /app
+RUN CGO_ENABLED=1 GOOS=linux go build -buildvcs=false -ldflags "-X 'github.com/danstis/CrowdSound/internal/version.Version=$BUILD'" -gcflags="all=-dwarflocationlists=true" -tags=alpine -o /app/api ./cmd/api
+
+FROM alpine:3
+RUN apk --no-cache add ca-certificates
+WORKDIR /app
+COPY --from=builder /app/* ./
+COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
+ENV TZ=Australia/Brisbane \
+    ZONEINFO=/zoneinfo.zip
+CMD [ "./api" ]
+COPY .git .git

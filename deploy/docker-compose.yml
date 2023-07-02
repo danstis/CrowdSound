@@ -1,0 +1,19 @@
+# docker-compose up -d --build --remove-orphans
+# or with new docker compose 2.x
+# docker compose up -d --build --remove-orphans
+version: '3'
+name: crowdsound
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: cmd/api/dockerfile
+      args:
+        - BUILD=${VERSION}
+    restart: "no" #on-failure
+    ports:
+      - 9200:9200
+    environment:
+      UPTRACE_DSN: ${UPTRACE_DSN}
+      UPTRACE_ENVIRONMENT: ${UPTRACE_ENVIRONMENT}
+      ROOKOUT_TOKEN: ${ROOKOUT_TOKEN}
