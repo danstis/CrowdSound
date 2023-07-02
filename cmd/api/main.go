@@ -16,7 +16,12 @@ const (
 
 func main() {
 	initTracer()
-	defer uptrace.Shutdown(context.Background())
+	defer func() {
+		err := uptrace.Shutdown(context.Background())
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	api := api.New()
 	api.Address = ADDRESS
 	log.Fatal(api.Run())
