@@ -6,6 +6,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
 	docs "github.com/danstis/CrowdSound/pkg/docs"
 	swaggerfiles "github.com/swaggo/files"
@@ -25,6 +26,7 @@ type (
 // Returns a pointer to the API struct.
 func New() *API {
 	r := gin.Default()
+	r.Use(otelgin.Middleware("crowdsound-api"))
 	docs.SwaggerInfo.BasePath = "/"
 	docs.SwaggerInfo.Title = "CrowdSound API"
 
