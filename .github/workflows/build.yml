@@ -24,7 +24,7 @@ jobs:
         id: go
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -41,7 +41,7 @@ jobs:
           go-version: ^1.20
         id: go
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install GitVersion
@@ -81,7 +81,7 @@ jobs:
         id: go
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run golangci-lint # https://github.com/marketplace/actions/run-golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -98,7 +98,7 @@ jobs:
       contents: write
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -128,7 +128,7 @@ jobs:
           tag_prefix: v
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash == '' }}
         with:
           fetch-depth: 0
